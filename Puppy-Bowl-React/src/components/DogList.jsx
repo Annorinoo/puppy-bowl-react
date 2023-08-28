@@ -3,6 +3,7 @@ import React from 'react';
 import DogCard from './DogCard';
 import './DogList.css';
 
+// dogs, onDelete are parameters
 function DogList({ dogs, onDelete }) {
   return (
     <div className="dog-list">
