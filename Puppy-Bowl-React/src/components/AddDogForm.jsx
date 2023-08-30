@@ -17,7 +17,7 @@ function AddDogForm({ onAdd }) {
   
     const handleSubmit = async (event) => {
       event.preventDefault();
-  
+    
       try {
         const response = await fetch('https://fsa-puppy-bowl.herokuapp.com/api/2305-ftb-pt-web-pt/players', {
           method: 'POST',
@@ -26,20 +26,18 @@ function AddDogForm({ onAdd }) {
           },
           body: JSON.stringify({
             name: dogData.name,
-            // id: dogData.id,
             breed: dogData.breed,
-            status: dogData.status.toLowerCase(), // Make sure the status value is lowercase
+            status: dogData.status.toLowerCase(),
             image: dogData.image,
           }),
         });
-  
+    
         const data = await response.json();
-  
+    
         if (data.success) {
-          onAdd(data.data); // Assuming the server responds with the newly added dog
+          onAdd(data.data.player); // Pass the newly added dog to the onAdd function
           setDogData({
             name: '',
-            // id: '',
             breed: '',
             status: '',
             image: '',

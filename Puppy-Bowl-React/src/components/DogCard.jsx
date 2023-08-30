@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+
 // 1. Create a card with info (img, name, id) and collapsable additional info (breed and status)
 // 2. Collapsable details should include a button
 // 3. Card should also include a 'Delete' button to delete the dog

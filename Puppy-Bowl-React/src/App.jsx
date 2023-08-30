@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Link, BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import DogList from './components/DogList';
 import AddDogForm from './components/AddDogForm';
+import SearchBar from './components/SearchBar.jsx';
 import './App.css';
 
-// Define main App component
 function App() {
 
   // useState hook to return an array with two elements: current state value, and a function to update that value
   // 'dogs' holds the current value of the state = array of dogs
   // 'setDogs' function to update the value of 'dogs'. When called with a new value, it will trigger a re-render of the component and update the state
   const [dogs, setDogs] = useState([]);
+  const [filteredDogs, setFilteredDogs] = useState([]);
 
   // Async function fetchData to initiate a network test to a specific URL may take time. 
   async function fetchData () {
@@ -38,15 +39,26 @@ function App() {
     fetchData();
   },[]);
 
-  // function 'addDog' with `dog` as the parameter 
-  const addDog = async(dog) => {
+    // function 'addDog' with `dog` as the parameter 
+  const addDog = async (newDog) => {
+    try {
+      const response = await fetch('https://fsa-puppy-bowl.herokuapp.com/api/2305-ftb-pt-web-pt/players');
+      const data = await response.json();
+
+      if (data.success) {
+        setDogs([...dogs, newDog]);
+      } else {
+        console.error('Error adding new dog:', data.error);
+      }
+      } catch (error) {
+        console.error('Error adding new dog:', error);
+      }
+    };
+
     // Uses 'setDogs' function (provided by the 'useState' hook) to update the 'dogs' state
     // [...dogs, dog] is an expression to create a new array. '...' is a spread operator to copy all the elements from the existing 'dogs' array. 
     //(aka, contents of 'dogs' are duplicated into a new array)
     // then adds the new 'dog' object to the end of the copied array
-    setDogs([...dogs, dog]);
-    console.log("addDog App.jsx")
-  };
 
   // Async arrow function to delete a dog using 'id' as a parameter.
   const deleteDog = async (id) => {
@@ -74,18 +86,43 @@ function App() {
     }
   };
 
+  const handleSearch = (searchTerm) => {
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+
+    const filteredDogs = dogs.filter((dog) => {
+      return (
+        dog.name.toLowerCase().includes(lowercasedSearchTerm) ||
+        dog.breed.toLowerCase().includes(lowercasedSearchTerm)
+      );
+    });
+
+    setFilteredDogs(filteredDogs);
+  };
+
   return (
     <Router>
       <div className="App">
         <h1>Puppy Bowl</h1>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+              <Link to="/add">Add Dog</Link>
+            </li>
+          </ul>
+        </nav>
+        <SearchBar onSearch={handleSearch} />
         <Routes>
-          <Route path="/" element={<DogList dogs={dogs} onDelete={deleteDog} />} />
+          <Route
+            path="/"
+            element={<DogList dogs={filteredDogs.length > 0 ? filteredDogs : dogs} onDelete={deleteDog} />}
+          />
           <Route path="/add" element={<AddDogForm onAdd={addDog} />} />
         </Routes>
       </div>
     </Router>
   );
-}
+};
 
 export default App;
 
